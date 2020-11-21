@@ -42,10 +42,13 @@ class AppDemo extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         body: TemplateViewer(
-          templates: [
-            TemplateData(
-                name: 'Flutter Logo',
-                templateBuilder: (ctx) => Container(
+          groups: [
+            TemplateGroup(
+              name: '/',
+              templates: [
+                TemplateData(
+                    name: 'Flutter Logo',
+                    templateBuilder: (ctx) => Container(
                       color: Colors.amberAccent,
                       child: Center(
                         child: SizedBox(
@@ -58,36 +61,38 @@ class AppDemo extends StatelessWidget {
                         ),
                       ),
                     )),
-            TemplateData(
-              name: 'Placeholder',
-              templateBuilder: (ctx) => Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Center(
-                        child: Row(
-                          children: [
-                            Text(
-                              'Text very long',
-                              style: Theme.of(context).textTheme.headline2,
+                TemplateData(
+                  name: 'Placeholder',
+                  templateBuilder: (ctx) => Container(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Center(
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Text very long',
+                                  style: Theme.of(context).textTheme.headline2,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          RaisedButton(
+                            onPressed: () {},
+                            child: Text('Button'),
+                            color: Theme.of(context).primaryColor,
+                          )
+                        ],
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      RaisedButton(
-                        onPressed: () {},
-                        child: Text('Button'),
-                        color: Theme.of(context).primaryColor,
-                      )
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
           ],
         ),

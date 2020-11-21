@@ -21,7 +21,7 @@ class DeviceInfo {
 }
 
 final iphone5 =
-    DeviceInfo(name: 'Iphone 5/SE', size: Size(320.0, 568.0), skinks: [
+    DeviceInfo(name: 'iPhone 5/SE', size: Size(320.0, 568.0), skinks: [
   DeviceSkin(
     position: Offset(0, 140 / 2),
     size: Size(640.0 / 2, 908.0 / 2.0),
@@ -37,7 +37,7 @@ final motoG4 = DeviceInfo(name: 'Moto G4', size: Size(360.0, 640.0), skinks: [
 ]);
 
 final iphone6 =
-    DeviceInfo(name: 'IPhone 6/7/8', size: Size(375.0, 667.0), skinks: [
+    DeviceInfo(name: 'iPhone 6/7/8', size: Size(375.0, 667.0), skinks: [
   DeviceSkin(
     position: Offset(0, 134 / 1.92),
     size: Size(375, 1062.0 / 1.92),
@@ -45,7 +45,19 @@ final iphone6 =
   )
 ]);
 final iphone6Plus =
-    DeviceInfo(name: 'IPhone 6/7/8 Plus', size: Size(414.0, 736.0));
+    DeviceInfo(name: 'iPhone 6/7/8 Plus', size: Size(414.0, 736.0));
+
+final iphone11 = DeviceInfo(
+  name: 'iPhone 11',
+  size: Size(414, 1792 / 2),
+  skinks: [
+    DeviceSkin(
+      position: Offset(0, 96),
+      size: Size(414, 718),
+      skinAssetUrl: 'iphone11_into_browser.png',
+    )
+  ],
+);
 
 class DeviceViewPort extends StatelessWidget {
   final DeviceInfo device;
@@ -98,6 +110,17 @@ class DeviceViewPort extends StatelessWidget {
     var skin = device.skinks[0];
     return Stack(
       children: [
+        ColorFiltered(
+          colorFilter: ColorFilter.mode(
+            Colors.blue,
+            BlendMode.color,
+          ),
+          child: IgnorePointer(
+            child: Image.asset(
+              'packages/flutter_template_viewer/skins/${skin.skinAssetUrl}',
+            ),
+          ),
+        ),
         Positioned(
           left: skin.position.dx,
           top: skin.position.dy,
@@ -107,13 +130,7 @@ class DeviceViewPort extends StatelessWidget {
             child: widget,
           ),
         ),
-        IgnorePointer(
-          child: Image.asset(
-            'packages/flutter_template_viewer/skins/${skin.skinAssetUrl}',
-          ),
-        ),
       ],
     );
   }
 }
-

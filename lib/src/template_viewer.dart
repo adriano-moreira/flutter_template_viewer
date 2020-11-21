@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template_viewer/src/devices.dart';
+import 'package:provider/provider.dart';
 
 class SingleTemplateViewer extends StatelessWidget {
   final Widget Function(BuildContext context) templateBuilder;
@@ -28,10 +29,10 @@ class SingleTemplateViewer extends StatelessWidget {
             device: iphone6,
             widget: templateBuilder(context),
           ),
-//          DeviceViewPort(
-//            device: iphone6Plus,
-//            widget: templateBuilder(context),
-//          ),
+          DeviceViewPort(
+            device: iphone11,
+            widget: templateBuilder(context),
+          ),
         ],
       ),
     );
@@ -48,64 +49,109 @@ class TemplateData {
   });
 }
 
-class TemplateViewer extends StatefulWidget {
-
+class TemplateGroup {
+  final String name;
   final List<TemplateData> templates;
 
-  TemplateViewer({
-    @required this.templates
+  TemplateGroup({
+    this.name,
+    this.templates,
   });
-
-  @override
-  _TemplateViewerState createState() => _TemplateViewerState();
 }
 
-class _TemplateViewerState extends State<TemplateViewer> {
-  num selected = 0;
+class TemplateViewModel extends ChangeNotifier {
+  final List<TemplateGroup> groups;
+  TemplateData _current;
+
+  TemplateViewModel({this.groups}) {
+    _current = groups[0].templates[0];
+  }
+
+  TemplateData get current => _current;
+
+  set current(TemplateData value) {
+    _current = value;
+    notifyListeners();
+  }
+}
+
+class TemplateViewer extends StatelessWidget {
+  final List<TemplateGroup> groups;
+
+  TemplateViewer({this.groups});
 
   @override
   Widget build(BuildContext context) {
-
-    if(widget.templates.length == 0) {
-      return Container(
-        child: Center(
-          child: Text('Has no templates'),
-        ),
-      );
-    }
-
-    return Row(
-      children: [
-        SizedBox(
-            width: 200,
-            child: ListView.builder(
-              itemCount: widget.templates.length,
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    setState(() {
-                      selected = index;
-                    });
-                  },
-                  child: Container(
-                    color: index == selected ? Colors.orange: Colors.transparent,
-                    child: ListTile(
-                      title: Text(widget.templates[index].name),
-                    ),
-                  ),
-                );
-              },
-            )),
-        Flexible(
-          child: FittedBox(
-            fit: BoxFit.fill,
-            child: SingleTemplateViewer(
-              templateBuilder: widget.templates[selected].templateBuilder,
-            ),
-          ),
-        ),
-      ],
+    return ChangeNotifierProvider(
+      create: (ctx) => TemplateViewModel(groups: groups),
+      child: Row(
+        children: [
+          Menu(),
+          Body(),
+        ],
+      ),
     );
   }
 }
 
+class Menu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final model = context.watch<TemplateViewModel>();
+    return SizedBox(
+      width: 180,
+      child: SingleChildScrollView(
+        child: ExpansionPanelList(
+          children: [
+            ...model.groups
+                .map(
+                  (group) => toExpansionPanel(group, context),
+                )
+                .toList()
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+ExpansionPanel toExpansionPanel(TemplateGroup group, BuildContext context) {
+  List<Widget> _buildItems(BuildContext context) {
+    return group.templates
+        .map<Widget>(
+          (t) => InkWell(
+            onTap: () {
+              context.read<TemplateViewModel>().current = t;
+            },
+            child: ListTile(
+              title: Text(t.name),
+            ),
+          ),
+        )
+        .toList();
+  }
+
+  return ExpansionPanel(
+    headerBuilder: (_, __) => Text(group.name),
+    body: Column(
+      children: _buildItems(context),
+    ),
+    isExpanded: true,
+  );
+}
+
+class Body extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final model = context.watch<TemplateViewModel>();
+    return Expanded(
+      child: FittedBox(
+        child: SingleChildScrollView(
+          child: SingleTemplateViewer(
+            templateBuilder: model.current.templateBuilder,
+          ),
+        ),
+      ),
+    );
+  }
+}
